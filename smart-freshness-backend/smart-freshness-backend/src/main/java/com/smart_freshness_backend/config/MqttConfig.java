@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.net.ssl.SSLSocketFactory;
+import java.util.UUID;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Configuration
@@ -51,18 +54,30 @@ public class MqttConfig {
             options.setPassword(password.toCharArray());
         }
 
+        // Enable SSL/TLS if broker URL starts with "ssl://"
+        if (broker != null && broker.startsWith("ssl://")) {
+            try {
+                options.setSocketFactory(SSLSocketFactory.getDefault());
+                log.info("SSL/TLS enabled for MQTT broker connection");
+            } catch (Exception e) {
+                log.error("Failed to configure SSL for MQTT: {}", e.getMessage());
+            }
+        }
+
         return options;
     }
 
     @Bean
     public MqttClient mqttClient(MqttConnectOptions options) {
+        // Append a unique suffix to the client ID to avoid conflicts on cloud brokers
+        String uniqueClientId = clientId + "-" + UUID.randomUUID().toString().substring(0, 8);
         try {
-            MqttClient client = new MqttClient(broker, clientId, new MemoryPersistence());
+            MqttClient client = new MqttClient(broker, uniqueClientId, new MemoryPersistence());
 
             // Try to connect, but don't fail if MQTT broker is not available
             try {
                 client.connect(options);
-                log.info("Connected to MQTT broker: {}", broker);
+                log.info("Connected to MQTT broker: {} as {}", broker, uniqueClientId);
             } catch (MqttException e) {
                 log.warn("Could not connect to MQTT broker: {}. MQTT features will be disabled.",
                         e.getMessage());

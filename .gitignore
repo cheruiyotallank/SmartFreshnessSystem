@@ -1,1 +1,4 @@
 esp32/smart_freshness_esp32.ino
+esp32/MOSQUITTO_SETUP.md
+esp32/README.md
+esp32/mosquitto.conf

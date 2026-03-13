@@ -1,0 +1,47 @@
+# render.yaml - Render deployment configuration for Smart Freshness Backend
+# This file tells Render how to build and deploy the backend service
+
+services:
+  - type: web
+    name: smart-freshness-backend
+    runtime: docker
+    dockerfilePath: ./smart-freshness-backend/smart-freshness-backend/Dockerfile
+    dockerContext: ./smart-freshness-backend/smart-freshness-backend
+    plan: free
+    healthCheckPath: /actuator/health
+    envVars:
+      # Database
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      # JWT
+      - key: JWT_SECRET
+        generateValue: true
+      # CORS - Update with your Netlify URL
+      - key: CORS_ORIGINS
+        sync: false
+      # MQTT (HiveMQ Cloud)
+      - key: MQTT_BROKER_URL
+        sync: false
+      - key: MQTT_USERNAME
+        sync: false
+      - key: MQTT_PASSWORD
+        sync: false
+      # Admin
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_NAME
+        value: System Admin
+      # TextBee SMS
+      - key: TEXTBEE_DEVICE_ID
+        sync: false
+      - key: TEXTBEE_API_KEY
+        sync: false
+      # Java opts for free tier memory limits
+      - key: JAVA_OPTS
+        value: -Xmx256m -Xms128m
