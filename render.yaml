@@ -1,5 +1,12 @@
+
 # render.yaml - Render deployment configuration for Smart Freshness Backend
-# This file tells Render how to build and deploy the backend service
+# This file tells Render how to build and deploy the backend service and its PostgreSQL database
+
+databases:
+  - name: smart-freshness-postgres
+    databaseName: smartfreshness
+    user: smartfreshness
+    plan: free
 
 services:
   - type: web
